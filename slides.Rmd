@@ -1,0 +1,119 @@
+---
+title: "Introduction to Unit Testing in R"
+author: "Myfanwy Johnston"
+date: "November 7, 2016"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## What we'll cover today
+
+Basics of unit testing
+ - what
+ - why
+testthat package
+assertr package
+Exercise
+
+## What we won't cover today
+
+- debugging (2/3 of development)
+- 
+- Bullet 3
+
+## Except to say
+
+ - Debugging is recommended when the return value (e.g. of a unit test) is erroneous and the error itself is not obvious (University of Freiburg slides)
+ - Debugging strategy: 
+    * realize you have a bug
+    * reproduce/generate the input values that cause the bug
+    * isolate the flawed component with a binary search
+    * fix it
+    * confirm its' successful resolution using the previous input
+ - when using unit testing, that last step is really creating an automated test
+
+## Debugging with print()
+```{r cars, echo = TRUE}
+
+n = 5
+k = 3
+power = 0
+for (i in 0:k) {
+  power <- power * i
+  print(power)
+}
+power
+
+```
+
+# Unit Testing
+
+
+## Basics
+
+- unit tests focus on the lowest level of a program: very small chunks of code
+   - at the function or class level
+ - Rmd running after you've changed the code would be an example of larger, informal, integrative test
+ 
+## Main use cases for unit testing
+
+ - ensure that code matches specification
+ - detect bugs from changing or adding new code
+ 
+## Characteristics of unit testing
+
+ - each unit test usually consists of multiple simple comarisons
+ - focus on boundary issues of parameters
+ - quick runtimes that allow automated checks after each code change
+ - common quality metric is code coverage
+ - checks against pre-defined, expected outcomes
+ 
+## Unit Testing in R
+
+1. Store function `f` subject to testing in "`f.R`" file
+2. Source that file via `source`
+3. Create file `test.f.R` taht contains the tests
+4. Write test, e.g.
+```{r, echo = TRUE, eval= FALSE}
+test_that("Short description", {
+expect_equal(sum(1, 2, 3), 6)
+})
+```
+5. Load package `testthat`
+6. Run file via `test_file("test.f.R")`, or all files in a directory via `test_dir(...)`
+7. Asses results, i.e. failed tests
+ 
+
+## Asserts
+
+  Asserts trigger a specific message when a condition is not satisfied.
+
+ - `stop(...)`
+ - `stopifnot(...)`
+ - package: `asserthat`
+
+  Often used to check type and range of input to functions
+
+## assert example
+```{r cube, eval = FALSE, echo=TRUE}
+
+cube_root <- function(x) {
+if (class(x) != "numeric") {
+stop("Wrong variable class: not a single number")
+}
+if (x < 0) {
+stop("Wrong range: cannot be less than 0")
+}
+if (!is.finite(x)) {
+stop("Wrong range: cannot be infinite or NA")
+}
+return(x^(1/3))
+}
+cube_root("error") # should throw an error
+
+
+```
+

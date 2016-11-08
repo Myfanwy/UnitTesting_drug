@@ -1,0 +1,91 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# How Analysis, Debugging, and Testing Go Together
+
+Not all types of people who code are going to use the same approach for debugging and unit testing.  The best practices for software development are not going to be the same as the best practices for someone just doing analyses.  Since most D-RUG-gers are graduate students, this presentation will focus on how unit testing can benefit your workflow while coding for your dissertation.
+
+Unit testing by itself is a simple concept.  It applies to the smallest unit of your code.  A unit test might ensure that you are getting a numeric output from a function when you expect one, but it's not going to ensure that your function actually does what you want it to do, or that your analysis is correct.  For something approaching that, you'll need higher-level debugging tools and practices - these are essential in their own right, but we'll only be covering unit testing here.  That said, some tools and functions from debugging in R (like assert statments) go hand-in-hand with good unit tests, and we'll be making use of them.
+
+This post will introduce unit testing, first with stand-alone assert statements, and then through the `testthat` package.  We'll take you through some examples, and then have you go through an exercise of your own.
+
+But first, we can't really talk about unit testing in a scientific context without introducing Test-Driven Data Analysis as a concept.
+
+```{r setup, message=FALSE}
+library(tidyverse)
+library(testthat)
+library(assertthat)
+
+```
+
+# What is Test-Driven Data Analysis (TDDA)?
+
+The short answer is that it's a set of useful practices, tools and processes involved in testing code that is used in scientific analyses. TDDA helps you test all aspects of your analysis through the testing of your code, including but not limited to inputs, outputs, algorithms, references, and results.
+
+The long answer is that [TDDA is a complex topic under active development](www.tdda.info/why=test-driven-data-analysis), and you should take the time to explore it both for your own cognitive benefit and for that of your work.
+
+Unit testing is one component of this large topic.  We'll discuss unit testing within the context of its relevance and application to the workflow of a graduate student or a scientific researcher who codes their own analyses.
+
+# What is a unit test?
+
+A programmatic test that evaluates a unit of your code at the lowest level.  These tests are small bits of code that can often be automated.
+
+Unit tests typically make use of assert statements, which are functions that check whether some condition is true.
+
+An example of a function in R that makes assert statements is `stopifnot()`.
+
+
+# Where does a unit test go in your code?
+
+The way in which you write unit tests for your code will often depend on how you've organized all the code related to your analyses to begin with.  If you have a single script for your whole analyses, you might be writing your unit tests in-line.  Some examples of the most basic in-line types of unit tests are:
+
+```{r unittests_examples}
+
+# One way to think of an in-line unit test is really just as a bit of code that makes use of an assert function.  The main function that R provides for this is stopifnot(), which throws an error if a specified condition goes unmet:
+
+x <- 5
+y <- x^2
+stopifnot(y >=0) # evaluates just fine, because the condition that y is non-negative is met
+
+x <- 2*1i
+y <- x^2
+stopifnot(y >=0) # throws an error, because the condition that y is non-negative is NOT met
+
+```
+
+If you've organized your code more like a package (which I'd recommend), your unit tests are best written as separate files, all with a uniform naming format, that will go in a `/tests` directory.  The advantage to doing it this way is that if you go back and change your analysis code later, you can run all the tests at once to see if you've broken anything with your changes.
+
+# Assert statements with `assertthat` package
+
+The package `assertthat` replaces `stopifnot()` and provides a number of user-friendly assert functions, including:
+
+### `assert_that()`
+```{r}
+x <- 1:10
+assert_that(is.character(x))
+stopifnot(is.character(x)) # you can see that assertthat's error message is little a bit more informative
+```
+
+### `see_if()`
+
+Returns a logical value, with the error message as an attribute
+```{r}
+x <- 1:10
+see_if(is.character(x))
+see_if(length(x) == 3)
+```
+
+### `validate_that()` (often for more advanced use)
+
+Returns `TRUE` on success, otherwise returns a message (not an error) as a string:
+```{r}
+x <- 1
+validate_that(is.numeric(x))
+validate_that(is.character(x))
+
+```
+
+# Writing Unit Tests as Test Files with `testthat`
+
