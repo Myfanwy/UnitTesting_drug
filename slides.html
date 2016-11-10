@@ -325,23 +325,7 @@ dat %&gt;%
 <li>Go back to the &quot;do your work&quot; step. Rinse, repeat.</li>
 </ul>
 
-</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Sample workflow with fishtrackr functions</h2></hgroup><article  id="sample-workflow-with-fishtrackr-functions">
-
-<p>We wrote the code with the data structure I already had (raw .csv of data).</p>
-
-<p>Later, I put in data that had the same essential information, but was missing some columns I had written in to the original function. It threw a missmatching length error that I then had to painfully debug.</p>
-
-<p>So we threw in some assert statements that should have been there to begin with, and they stopped the function whenever a missing input was detected.</p>
-
-<p>Later, I realized I could just write the function so that it carries along ALL the columns of the input data, regardless of nit-picky names or dimensions.</p>
-
-<p>I re-wrote the function with this (better) code, and ran it again with three different dummy test data types:</p>
-
-<p>One that included just the original columns One that had extra columns One that had fewer columns than the original data</p>
-
-<p>These can be written as three different tests within the same testfile.</p>
-
-<p>Since I still got the output I wanted (fishpaths with TagID, Station, arrival, and departure), the tests passed.</p></article></slide>
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Sample workflow with fishtrackr functions</h2></hgroup><article  id="sample-workflow-with-fishtrackr-functions"></article></slide>
 
 
   <slide class="backdrop"></slide>

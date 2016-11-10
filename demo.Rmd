@@ -127,7 +127,7 @@ stopifnot(y >=0) # throws an error, because the condition that y is non-negative
 # A function to convert dimensions in pixels to mm:
 
 tomm <- function(width, height, dpi = 300) {
-  stopifnot(is.numeric(width))
+ stopifnot(is.numeric(width))
   stopifnot(is.numeric(height))
 widthout = (width * 25.4) / dpi
 heightout = (height * 25.4) / dpi
