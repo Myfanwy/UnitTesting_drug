@@ -10,4 +10,6 @@ Code accompanying Introduction to Unit Testing in R talk given at Davis R-Users 
  - [Assert statements and unit testing in R](https://www.youtube.com/watch?v=S1xYrEpEoJs)
  - [SWC's unit testing lesson](http://nicercode.github.io/2014-02-13-UNSW/lessons/45-testing/)
    * slides: https://swcarpentry.github.io/managing-research-software-projects/short/#/27
+ - [assertr package vignette](https://cran.r-project.org/web/packages/assertr/vignettes/assertr.html)
+ 
  
