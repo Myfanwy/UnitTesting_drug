@@ -2,118 +2,244 @@
 title: "Introduction to Unit Testing in R"
 author: "Myfanwy Johnston"
 date: "November 7, 2016"
-output: ioslides_presentation
+output: 
+  ioslides_presentation:
+    widescreen: true
+    incremental: true
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+```{r setup, include=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(testthat)
+library(assertthat)
 ```
 
-## What we'll cover today
+## Introduction
 
-Basics of unit testing
- - what
- - why
-testthat package
-assertr package
-Exercise
+Testing is not the same for everyone who codes.
 
-## What we won't cover today
+Unit testing by itself is a simple concept.  Unit tests are short, (usually automated) programmatic tests that are applied to a small unit of your code.
 
-- debugging (2/3 of development)
-- 
-- Bullet 3
+Agenda:
+ >- Types of Tests
+ >- Test-Driven Development (TDD)
+ >- How you might integrate these approaches into your own scientific workflow.  
+ >- Example of a testing workflow
 
-## Except to say
+# Types of Tests
+***
 
- - Debugging is recommended when the return value (e.g. of a unit test) is erroneous and the error itself is not obvious (University of Freiburg slides)
- - Debugging strategy: 
-    * realize you have a bug
-    * reproduce/generate the input values that cause the bug
-    * isolate the flawed component with a binary search
-    * fix it
-    * confirm its' successful resolution using the previous input
- - when using unit testing, that last step is really creating an automated test
+## Smoke tests
 
-## Debugging with print()
-```{r cars, echo = TRUE}
+Does the program run?
 
-n = 5
-k = 3
-power = 0
-for (i in 0:k) {
-  power <- power * i
-  print(power)
+## Unit tests
+
+Programmatic tests that evaluate a unit of your code at a low level.  These tests are small bits of code that can often be automated.  Most of the tests you create will probably NOT be unit tests by the strictest definition.
+
+## Functional tests
+
+User-facing tests that see if the code actually does what you want it to do.  Functional tests are what you'll be writing most of the time.
+
+## Regression Tests
+
+Tests to verify that code previously developed and tested still works after you've changed it (either to make it better or to handle a bug you encountered).
+
+# What is Test-Driven Development (TDD)?
+
+Suite of automated tests to specify the desired behaviour of a program and to verify that it is working correctly. 
+
+The goal is to have enough, sufficiently detailed tests to ensure that when they all pass we feel genuine confidence that the system is functioning correctly.
+
+## TDD Workflow
+
+"Red-Green-Refactor"
+
+    * Red: create a test and conceive of code (or data) that would 
+    fail that test
+    * Green: make the code pass that test by any means necessary
+    * Refactor: look at the code you've written, and ask yourself if 
+    you can improve it.  Run the tests again after each code change to 
+    make sure they still pass - if not, start again with "Red".
+    
+not all TDD practices will apply to our analyses or our workflow.
+
+# What is Test-Driven Data Analysis (TDDA)?
+
+## TDDA
+
+A set of useful practices, tools and processes involved in testing code that is used in scientific analyses. TDDA helps you test all aspects of your analysis through the testing of your code, including but not limited to inputs, outputs, algorithms, references, and results.
+
+## TDDA 
+Has your data led you to make errors of interpretation when you get your results?
+
+ - Given the results, do you believe your inputs are correct?
+ - How will your code handle null values?  Missing values?
+ - Will outliers (like extremeley large or exremely small values) or invalid inputs invalidate the calculation?
+ - If the values have dimensionality, do they all need be of the same dimensions?  Or in the same units?
+ 
+## TDDA
+
+In plain terms, every time you view an analytical result, you should be asking: "_Why is this lying bastard lying to me?_"
+
+or
+     
+"_How is this misleading data misleading me?_" ...and then writing tests that will boost your confidence that you haven't been hoodwinked the same way twice by your data.
+
+
+# What is Stupidity-Driven Development?
+
+##SDD
+
+####"For research purposes, we're much more worried about inaccurate research results than we are about crashing bugs. The latter are annoying and obtrusive, but don't result in erroneous results; inaccurate code causes much less visible problems that can be more serious scientifically. So we test the bejeezus out of our scientific code while practicing a kind of long game with the rest of the code: we wait until there are actual behavioral problems that we can trace back to some bit of source code, and then we fix it." - C. Titus Brown
+
+## SDD Workflow
+
+1. Write tests for the obvious potential issues you can think of (more on the specifics of this later)
+2. Write the code and run your data through it
+3. When bugs are encountered, write tests to fix the observed bug
+4. Get on with more important things
+
+##SDD Priorities in SDD 
+
+1) Correctness 
+2) Performance 
+3) User experience 
+4) Beautiful code
+
+
+# Where Do Tests Live?
+
+## Where do tests live?
+
+If a test needs to be run every time a certain function is called, the test should live in-line with the code of the actual function.  We'll call these "run-time" tests.
+
+If a test needs to be run to make sure the code hasn't broken after you've changed something, the test should live in its own test file (and associated test data files) in a separate directory.  We'll call these "test-time" tests.
+
+
+## "Run-Time Tests"
+
+user-facing
+
+Check small bits of code in the function, like input structures and formats
+
+They make small assessments and either throw an error or a warning message
+
+##Run-time tests
+
+Typically, run-time tests make use of assert statements, which are functions that check whether some condition is true.  If code is run that makes the condition untrue, the assert statement function will throw an error.
+
+An example of a function in R that makes assert statements is `stopifnot()`.
+
+
+## Examples basic types of run-time unit tests:
+
+```{r unittests_examples, echo=TRUE, eval=FALSE}
+
+# in a script:
+x <- 5
+y <- x^2
+stopifnot(y >=0) # evaluates just fine, 
+                # because the condition that y is non-negative is met
+
+x <- 2*1i
+y <- x^2
+stopifnot(y >=0) # throws an error, 
+                # because the condition that y is non-negative is NOT met
+```
+
+## Example of run-time test in a function:
+```{r, eval=FALSE}
+# A function to convert dimensions in pixels to mm:
+
+tomm <- function(width, height, dpi = 300) {
+  stopifnot(is.numeric(width))
+  stopifnot(is.numeric(height))
+widthout = (width * 25.4) / dpi
+heightout = (height * 25.4) / dpi
+return(c(widthout, heightout))
 }
-power
+
+tomm(width = 1300, height = 3000) # runs fine
+tomm(width = 1300, height = "3000")
 
 ```
 
-# Unit Testing
 
+##The `assertthat` and `assertr` packages
 
-## Basics
+The package `assertthat` replaces `stopifnot()` and provides a number of user-friendly assert functions.
 
-- unit tests focus on the lowest level of a program: very small chunks of code
-   - at the function or class level
- - Rmd running after you've changed the code would be an example of larger, informal, integrative test
- 
-## Main use cases for unit testing
+The package `assertr` is great for error-checking your data; these functions are good for either run-time tests or test-time tests.
 
- - ensure that code matches specification
- - detect bugs from changing or adding new code
- 
-## Characteristics of unit testing
-
- - each unit test usually consists of multiple simple comarisons
- - focus on boundary issues of parameters
- - quick runtimes that allow automated checks after each code change
- - common quality metric is code coverage
- - checks against pre-defined, expected outcomes
- 
-## Unit Testing in R
-
-1. Store function `f` subject to testing in "`f.R`" file
-2. Source that file via `source`
-3. Create file `test.f.R` taht contains the tests
-4. Write test, e.g.
-```{r, echo = TRUE, eval= FALSE}
-test_that("Short description", {
-expect_equal(sum(1, 2, 3), 6)
-})
-```
-5. Load package `testthat`
-6. Run file via `test_file("test.f.R")`, or all files in a directory via `test_dir(...)`
-7. Asses results, i.e. failed tests
- 
-
-## Asserts
-
-  Asserts trigger a specific message when a condition is not satisfied.
-
- - `stop(...)`
- - `stopifnot(...)`
- - package: `asserthat`
-
-  Often used to check type and range of input to functions
-
-## assert example
-```{r cube, eval = FALSE, echo=TRUE}
-
-cube_root <- function(x) {
-if (class(x) != "numeric") {
-stop("Wrong variable class: not a single number")
+## `assertthat::assert_that()`
+```{r eval=FALSE, echo=TRUE}
+tomm <- function(width, height, dpi = 300) {
+  assert_that(is.numeric(width))
+  assert_that(is.numeric(height))
+widthout = (width * 25.4) / dpi
+heightout = (height * 25.4) / dpi
+return(c(widthout, heightout))
 }
-if (x < 0) {
-stop("Wrong range: cannot be less than 0")
-}
-if (!is.finite(x)) {
-stop("Wrong range: cannot be infinite or NA")
-}
-return(x^(1/3))
-}
-cube_root("error") # should throw an error
 
+tomm(width = 1300, height = "3000")# you can see that assertthat's 
+# error message is little a bit more informative
 
 ```
 
+##`assertr::verify()`
+
+Use case: you're reading in a data file that you know has more than 100 observations but you want to make sure it imported all of them.
+```{r eval=FALSE, echo=TRUE}
+library(assertr)
+dat <- read.csv("a-data-file.csv")
+dat %>%
+  assertr::verify(nrow(.) > 100)
+```
+
+
+## "Test-Time" Tests
+
+These are the tests you want to write before you write your actual code.  They're the ones that ask "what do I want my function to do?"  "What should the output of my function actually be like?"  
+
+Test-time tests live in their own test files, the names of which should begin with "test".  The package `testthat` (along with the `devtools` package development tools) provides the best directory structure and convenience functions for writing test files.
+
+These tests will be run only occasionally.  Typically, they'll be run once when you first write the code, and then again when you change any part of the code to make sure your code is still passing all its tests.
+
+
+# The Testing Workflow for Scientists
+
+Thinking of how to write a test that answers the questions above is daunting, but you're about to make it really easy on yourself.  Here's how:
+
+## Testing Workflow
+
+   > - Take a tiny sample of your data.  Five rows (or observations) is a good start.
+
+   > - Write your function with those five observations in mind.  Try to make the observations as representative as possible of the full dataset that you would put through this function.  
+   
+   > - See if the function worked the way you want it to for those observations (the output for 5 observations will probably be small enough to allow you to inspect the output of the function "by hand", or visually).
+
+   > - If the output is what you expected it to be, congratulations!  You've just written your first test, which, at least initially, is identical to your function.
+
+## Testing Workflow 
+
+   > - Think of ways you can trip up your function.  What happens if you feed it 5 null observations?  Does it throw an error, or is it silent?  Is the error intelligible?  You've just written your second test.  If it failed (doesn't throw an error with null data, for example), it's time to change your code (maybe adding a runtime test for null values like `assertthat::assert_that(not_empty(x))` or `assertr::verify(x > 0)`).  Then run your first test again and make sure it still passes.
+
+## Testing Workflow
+
+   > - Now do your work.  Inevitably, you're going to observe some weird behavior from your function that you didn't anticipate.  When that happens, you've encountered a bug in your code, and it's time to go through the debugging process (not covered here, sorry), figure out what's causing the weird behavior, and...
+  
+## Testing Workflow
+
+   > - write another test with small dummy data that simulates the data that caused the bug (re-create the bug with a test).
+  
+   > - Change your code to address the bug so that your new dummy data test passes.
+  
+   > - Run all your other tests to make sure you haven't re-created old bugs in the fixing of your new bug.
+  
+   > - Go back to the "do your work" step.  Rinse, repeat.
+  
+
+
+# Sample workflow with fishtrackr functions
