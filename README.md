@@ -1,6 +1,6 @@
 # Introduction to Unit Testing in R
 
-Code accompanying Introduction to Unit Testing in R [talk given at Davis R-Users Group](https://youtu.be/uVQODVlOvPE).
+Code accompanying Introduction to Unit Testing in R [talk given at Davis R-Users Group](https://www.youtube.com/watch?time_continue=7&v=8G6bBum3O9A).
 
 ### Links to related resources:
 
