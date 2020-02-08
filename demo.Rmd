@@ -1,6 +1,8 @@
 ---
 title: "Unit Testing in R - An introductory workflow for scientists"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 # Introduction
@@ -16,6 +18,14 @@ library(tidyverse)
 library(testthat)
 library(assertthat)
 ```
+
+<style type="text/css">
+.main-container {
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
 
 # Types of Tests
 
@@ -74,7 +84,7 @@ TDDA strives to get you to write tests that validate whether the result you have
 
 If TDDA is the ideal, SDD is more like the reality on the ground for people who write scientific code.
 
-####"For research purposes, we're much more worried about inaccurate research results than we are about crashing bugs. The latter are annoying and obtrusive, but don't result in erroneous results; inaccurate code causes much less visible problems that can be more serious scientifically. So we test the bejeezus out of our scientific code while practicing a kind of long game with the rest of the code: we wait until there are actual behavioral problems that we can trace back to some bit of source code, and then we fix it." - C. Titus Brown
+    "For research purposes, we're much more worried about inaccurate research results than we are about crashing bugs. The latter are annoying and obtrusive, but don't result in erroneous results; inaccurate code causes much less visible problems that can be more serious scientifically. So we test the bejeezus out of our scientific code while practicing a kind of long game with the rest of the code: we wait until there are actual behavioral problems that we can trace back to some bit of source code, and then we fix it." - C. Titus Brown
 
 Testing in a Stupidity-Driven Development framework is more about writing lots of tests for the scientific core of the code, and writing far fewer tests for other project components (if you're working in R, it's possible you might not even HAVE any of these project components).  
 
@@ -111,7 +121,7 @@ An example of a function in R that makes assert statements is `stopifnot()`.
 
 ### Examples basic types of run-time unit tests:
 
-```{r unittests_examples, echo=TRUE}
+```{r unittests_examples, echo=TRUE, eval=FALSE}
 
 # in a script:
 x <- 5
@@ -147,7 +157,7 @@ The package `assertthat` replaces `stopifnot()` and provides a number of user-fr
 The package `assertr` is great for error-checking your data; these functions are good for either run-time tests or test-time tests.
 
 ### `assertthat::assert_that()`
-```{r}
+```{r, eval=FALSE, echo=TRUE}
 tomm <- function(width, height, dpi = 300) {
   assert_that(is.numeric(width))
   assert_that(is.numeric(height))
@@ -163,7 +173,7 @@ tomm(width = 1300, height = "3000")# you can see that assertthat's error message
 ###`assertr::verify()`
 
 Use case: you're reading in a data file that you know has more than 100 observations but you want to make sure it imported all of them.
-```{r}
+```{r, echo=TRUE, eval=FALSE}
 library(assertr)
 dat <- read.csv("a-data-file.csv")
 dat %>%
@@ -226,5 +236,10 @@ I re-wrote the function with this (better) code, and ran it again with three dif
 These can be written as three different tests within the same testfile.
 
 Since I still got the output I wanted (fishpaths with TagID, Station, arrival, and departure), the tests passed.
-
-
+<br>
+<br>
+<br>
+<br>
+-------------
+<br>
+<br>

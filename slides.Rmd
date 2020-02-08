@@ -2,10 +2,10 @@
 title: "Introduction to Unit Testing in R"
 author: "Myfanwy Johnston"
 date: "November 7, 2016"
-output: 
+output:
   ioslides_presentation:
-    widescreen: true
-    incremental: true
+    incremental: yes
+    widescreen: yes
 ---
 
 ```{r setup, include=FALSE, message=FALSE}
